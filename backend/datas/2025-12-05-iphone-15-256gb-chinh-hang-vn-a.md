@@ -1,0 +1,26 @@
+---
+title: "iPhone 15 256GB | Chính hãng VN/A"
+date: "2025-12-05"
+categories: ["Đồ chơi công nghệ", "CellphoneS"]
+tags: ["phụ kiện", "gadget", "giá: Liên hệ"]
+source_url: "https://cellphones.com.vn/iphone-15-256gb.html"
+price: "Liên hệ"
+---
+
+# iPhone 15 256GB | Chính hãng VN/A
+
+**Giá tham khảo:** Liên hệ
+**Nguồn:** [CellphoneS](https://cellphones.com.vn/iphone-15-256gb.html)
+
+## Thông số kỹ thuật / Đặc điểm
+- Kích thước màn hình 6.1 inches
+- Công nghệ màn hình Super Retina XDR OLED
+- Camera sau Chính 48 MP & Phụ 12 MP
+- Camera trước 12MP, ƒ/1.9
+- Chipset Apple A16 Bionic 6 nhân
+- Công nghệ NFC Có
+- Dung lượng RAM 6 GB
+- Bộ nhớ trong 256 GB
+
+## Mô tả sản phẩm
+...

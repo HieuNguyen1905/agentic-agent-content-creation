@@ -1,0 +1,26 @@
+---
+title: "Xiaomi 15 Ultra 5G 16GB 1TB"
+date: "2025-12-05"
+categories: ["Đồ chơi công nghệ", "CellphoneS"]
+tags: ["phụ kiện", "gadget", "giá: Liên hệ"]
+source_url: "https://cellphones.com.vn/dien-thoai-xiaomi-15-ultra-1tb.html"
+price: "Liên hệ"
+---
+
+# Xiaomi 15 Ultra 5G 16GB 1TB
+
+**Giá tham khảo:** Liên hệ
+**Nguồn:** [CellphoneS](https://cellphones.com.vn/dien-thoai-xiaomi-15-ultra-1tb.html)
+
+## Thông số kỹ thuật / Đặc điểm
+- Kích thước màn hình 6.73 inches
+- Công nghệ màn hình AMOLED
+- Camera sau Camera chính Leica: 50MP, ƒ/1.63, OIS Camera tele Leica: 50MP, ƒ/1.8, OIS Camera siêu tele Leica: 200MP, ƒ/2.6, OIS Camera góc siêu rộng Leica: 50MP, ƒ/2.2, 115° FOV
+- Camera trước Camera trước: 32MP, ƒ/2.0, 90° FOV Cảm biến OV32B Tiêu cự 21mm
+- Chipset Snapdragon 8 Elite (Tiến trình sản xuất 3nm)
+- Công nghệ NFC Có
+- Dung lượng RAM 16 GB
+- Bộ nhớ trong 1 TB
+
+## Mô tả sản phẩm
+...
