@@ -93,6 +93,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} | Blog`,
     description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: 'article',
+      publishedTime: post.date,
+    },
   };
 }
 
@@ -102,17 +108,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post) {
     return (
-      <div>
-        <div className="mx-auto max-w-4xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Post Not Found
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-              The blog post you're looking for doesn't exist.
-            </p>
-         
-          </div>
+      <div className="mx-auto max-w-4xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Post Not Found
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            The blog post you're looking for doesn't exist.
+          </p>
+          <Link
+            href="/blog"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Back to Blog
+          </Link>
         </div>
       </div>
     );

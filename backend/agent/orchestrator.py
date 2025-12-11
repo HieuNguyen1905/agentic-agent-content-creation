@@ -93,12 +93,20 @@ class BlogGenerationOrchestrator:
 
             # Phase 3: Iterative Refinement
             logger.info("Phase 3: Iterative refinement and evaluation")
-            final_draft = await self._iterative_refinement_loop(draft, spec)
+            final_draft, final_evaluation = await self._iterative_refinement_loop(draft, spec)
 
             if not final_draft:
                 # Fallback: Return the last draft if no approval achieved after max iterations
                 logger.warning(f"No draft approved after {self.max_iterations} iterations, falling back to last iteration")
                 final_draft = draft  # Use initial draft if no iterations succeeded
+                # Evaluate the fallback draft
+                final_evaluation = await self.evaluator.evaluate_draft(final_draft, spec)
+            
+            # Add SEO score to final draft
+            if final_evaluation:
+                seo_score = final_evaluation.get('validation_details', {}).get('seo_score', 0)
+                final_draft['seo_score'] = seo_score
+                logger.info(f"Final SEO Score: {seo_score}/100")
 
             # Phase 4: Ingestion
             logger.info("Phase 4: Ingesting final content")
@@ -127,7 +135,7 @@ class BlogGenerationOrchestrator:
                 error=str(e)
             )
 
-    async def _iterative_refinement_loop(self, initial_draft: Dict[str, Any], spec: GenerationSpec) -> Optional[Dict[str, Any]]:
+    async def _iterative_refinement_loop(self, initial_draft: Dict[str, Any], spec: GenerationSpec) -> tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
         """
         Iteratively refine the draft until it passes evaluation or hits max iterations.
 
@@ -136,10 +144,11 @@ class BlogGenerationOrchestrator:
             spec: Generation specifications
 
         Returns:
-            Final approved draft or None if failed
+            Tuple of (Final approved draft, Final evaluation) or (None, None) if failed
         """
         current_draft = initial_draft
         feedback = None
+        last_evaluation = None
 
         for iteration in range(self.max_iterations):
             logger.info(f"Refinement iteration {iteration + 1}/{self.max_iterations}")
@@ -154,10 +163,36 @@ class BlogGenerationOrchestrator:
 
             # Evaluate the current draft
             evaluation = await self.evaluator.evaluate_draft(current_draft, spec)
-
+            last_evaluation = evaluation
+            
+            # Display SEO score for each iteration
+            seo_score = evaluation.get('validation_details', {}).get('seo_score', 0)
+            seo_details = evaluation.get('validation_details', {}).get('seo_details', {})
+            
+            print("\n" + "="*60)
+            print(f"📊 ITERATION {iteration + 1} - SEO SCORE: {seo_score}/100")
+            print("="*60)
+            
+            if seo_details.get('details'):
+                details = seo_details['details']
+                print("\n🔍 SEO Breakdown:")
+                print(f"  • Title: {details.get('title', {}).get('status', 'N/A')} ({details.get('title', {}).get('length', 0)} chars)")
+                print(f"  • Headings: {details.get('headings', {}).get('h2', 0)} H2, {details.get('headings', {}).get('h3', 0)} H3")
+                print(f"  • Word Count: {details.get('word_count', {}).get('count', 0)} words")
+                print(f"  • Links: {details.get('links', {}).get('count', 0)} found")
+                print(f"  • Images: {details.get('images', {}).get('count', 0)} found")
+                print(f"  • Lists: {details.get('lists', {}).get('total', 0)} items")
+                print(f"  • Avg Paragraph: {details.get('paragraphs', {}).get('avg_length', 0)} words")
+                print(f"  • Bold/Emphasis: {details.get('emphasis', {}).get('count', 0)} uses")
+            
+            if seo_details.get('issues'):
+                print("\n⚠️  SEO Issues:")
+                for issue in seo_details['issues']:
+                    print(f"  - {issue}")
+            
             if evaluation.get('approved', False):
                 logger.info(f"Draft approved on iteration {iteration + 1}")
-                return current_draft
+                return current_draft, evaluation
 
             # Extract feedback for next iteration
             feedback = evaluation.get('feedback', 'Content needs improvement')
@@ -167,5 +202,5 @@ class BlogGenerationOrchestrator:
             await asyncio.sleep(0.1)
 
         logger.warning("Maximum iterations reached without approval")
-        # Return the last draft as fallback
-        return current_draft
+        # Return the last draft and evaluation as fallback
+        return current_draft, last_evaluation

@@ -14,22 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auto-Blog",
+  title: "Agentic Content Creation",
   description: "An automated blogging platform powered by AI for creating and managing content with ease.",
-  keywords: ["Auto-Blog", "AI Blogging", "Automated Content", "AI Writer", "Blog Management"],
-  authors: [{ name: "Auto-Blog Team" }],
-  creator: "Auto-Blog Team",
-  publisher: "Auto-Blog Team",
+  keywords: ["Agentic Content Creation", "AI Blogging", "Automated Content", "AI Writer", "Blog Management"],
+  authors: [{ name: "Agentic Content Creation Team" }],
+  creator: "Agentic Content Creation Team",
+  publisher: "Agentic Content Creation Team",
   openGraph: {
-    title: "Auto-Blog",
+    title: "Agentic Content Creation",
     description: "An automated blogging platform powered by AI for creating and managing content with ease.",
     url: "https://example.com",
-    siteName: "Auto-Blog",
+    siteName: "Agentic Content Creation",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Auto-Blog",
+    title: "Agentic Content Creation",
     description: "An automated blogging platform powered by AI for creating and managing content with ease.",
     creator: "@autoblog",
   },
@@ -53,22 +53,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                if (typeof window !== 'undefined') {
-                  if (window.location.pathname === '/') {
-                    document.body.classList.add('home-page');
-                  }
-                  console.log('Body className:', document.body.className);
-                }
-              })();
-            `,
-          }}
-        />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-full flex flex-col`}
       >

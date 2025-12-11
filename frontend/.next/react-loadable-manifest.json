@@ -1,0 +1,27 @@
+{
+  "app/components/MarkdownRenderer.tsx -> prismjs/themes/prism-tomorrow.css": {
+    "id": 3430,
+    "files": [
+      "static/css/f3b8208e8dab82f4.css",
+      "static/chunks/vendor-dc539d7826f8883b.js"
+    ]
+  },
+  "app/components/MarkdownRenderer.tsx -> react-markdown": {
+    "id": 6232,
+    "files": [
+      "static/chunks/vendor-dc539d7826f8883b.js"
+    ]
+  },
+  "app/components/MarkdownRenderer.tsx -> rehype-prism-plus": {
+    "id": 1603,
+    "files": [
+      "static/chunks/vendor-dc539d7826f8883b.js"
+    ]
+  },
+  "app/components/MarkdownRenderer.tsx -> rehype-raw": {
+    "id": 7361,
+    "files": [
+      "static/chunks/vendor-dc539d7826f8883b.js"
+    ]
+  }
+}

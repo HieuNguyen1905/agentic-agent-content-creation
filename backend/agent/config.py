@@ -37,7 +37,7 @@ class AgentConfig(BaseSettings):
 
     # OpenAI settings (ChatGPT)
     openai_api_key: str | None = None
-    openai_model: str = "gpt-4.1-mini"
+    openai_model: str = "gpt-4.1"
     # Primary base URL used by the OpenAI client
     openai_base_url: str = "https://api.openai.com/v1"
     # Optional alias for compatibility with OPENAI_API_BASE env var

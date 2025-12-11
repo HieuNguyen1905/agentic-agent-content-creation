@@ -15,6 +15,8 @@ export default function Header() {
     // { name: 'Projects', href: '/projects' },
     // { name: 'Art', href: '/art' },
     { name: 'Blog', href: '/' },
+    // { name: 'Posts', href: '/posts' },
+    { name: 'Dashboard', href: '/dashboard' },
     // { name: 'Contact', href: '/contact' },
   ];
 
@@ -50,11 +52,11 @@ export default function Header() {
               <div className="flex items-center space-x-2">
                 <div className="relative">
                   <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
-                    <span className="text-primary-foreground font-bold text-sm">AB</span>
+                    <span className="text-primary-foreground font-bold text-sm">ACC</span>
                   </div>
                 </div>
                 <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                  Auto-Blog
+                  Agentic Content Creation
                 </span>
               </div>
             </Link>

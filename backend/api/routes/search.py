@@ -1,0 +1,226 @@
+"""Search and retrieval routes."""
+
+import logging
+from typing import List, Optional
+from pathlib import Path
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
+import frontmatter
+
+logger = logging.getLogger(__name__)
+router = APIRouter()
+
+# Content directory
+CONTENT_DIR = Path(__file__).parent.parent.parent / "content" / "blog"
+
+
+class SearchResult(BaseModel):
+    """Search result item."""
+    content: str
+    metadata: dict
+    score: Optional[float] = None
+
+
+class SearchResponse(BaseModel):
+    """Search response."""
+    query: str
+    results: List[SearchResult]
+    total: int
+
+
+@router.get("/", response_model=SearchResponse)
+async def search_content(
+    q: str = Query(..., min_length=2, max_length=500, description="Search query"),
+    limit: int = Query(5, ge=1, le=50, description="Maximum results to return"),
+    threshold: float = Query(0.5, ge=0.0, le=1.0, description="Relevance threshold")
+):
+    """
+    Search through blog content using keyword matching.
+    
+    - **q**: Search query
+    - **limit**: Maximum number of results
+    - **threshold**: Minimum relevance score (0.0 to 1.0)
+    """
+    try:
+        logger.info(f"Search query: {q}")
+        
+        # Simple keyword search through posts
+        if not CONTENT_DIR.exists():
+            return SearchResponse(query=q, results=[], total=0)
+        
+        md_files = list(CONTENT_DIR.glob("*.md"))
+        search_results = []
+        
+        query_lower = q.lower()
+        
+        for file_path in md_files:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    post = frontmatter.load(f)
+                
+                # Simple keyword matching
+                title = post.get('title', '').lower()
+                content = post.content.lower()
+                
+                if query_lower in title or query_lower in content:
+                    # Calculate simple score
+                    score = 0.0
+                    if query_lower in title:
+                        score += 0.7
+                    if query_lower in content:
+                        score += 0.3
+                    
+                    search_results.append(SearchResult(
+                        content=post.content[:500] + "..." if len(post.content) > 500 else post.content,
+                        metadata={
+                            'slug': file_path.stem,
+                            'title': post.get('title', ''),
+                            'date': post.get('date', ''),
+                            'excerpt': post.get('excerpt', '')
+                        },
+                        score=score
+                    ))
+            except Exception as e:
+                logger.error(f"Error reading {file_path}: {e}")
+        
+        # Sort by score
+        search_results.sort(key=lambda x: x.score or 0, reverse=True)
+        search_results = search_results[:limit]
+        
+        logger.info(f"Found {len(search_results)} results for: {q}")
+        
+        return SearchResponse(
+            query=q,
+            results=search_results,
+            total=len(search_results)
+        )
+        
+    except Exception as e:
+        logger.error(f"Search error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/similar/{slug}")
+async def find_similar(
+    slug: str,
+    limit: int = Query(5, ge=1, le=20, description="Number of similar posts")
+):
+    """
+    Find similar blog posts to a given post.
+    
+    - **slug**: The post slug to find similar posts for
+    - **limit**: Maximum number of similar posts to return
+    """
+    try:
+        from api.routes.posts import CONTENT_DIR, parse_markdown_file
+        
+        # Get the original post
+        file_path = CONTENT_DIR / f"{slug}.md"
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail=f"Post '{slug}' not found")
+        
+        post = parse_markdown_file(file_path)
+        if not post:
+            raise HTTPException(status_code=500, detail="Failed to parse post")
+        
+        # For now, return empty - this requires vector store integration
+        # TODO: Implement using ChromaDB similarity search
+        similar = []
+        
+        return {
+            "slug": slug,
+            "similar_posts": similar,
+            "total": len(similar)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error finding similar posts for {slug}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/suggestions")
+async def get_suggestions(
+    query: str = Query(..., min_length=1, description="Partial query for suggestions"),
+    limit: int = Query(5, ge=1, le=10)
+):
+    """
+    Get search suggestions based on partial query.
+    
+    - **query**: Partial search query
+    - **limit**: Maximum number of suggestions
+    """
+    try:
+        # Simple title matching for suggestions
+        if not CONTENT_DIR.exists():
+            return {"query": query, "suggestions": []}
+        
+        md_files = list(CONTENT_DIR.glob("*.md"))
+        suggestions = []
+        query_lower = query.lower()
+        
+        for file_path in md_files:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    post = frontmatter.load(f)
+                title = post.get('title', '')
+                
+                if query_lower in title.lower():
+                    suggestions.append({
+                        "text": title,
+                        "slug": file_path.stem,
+                        "type": "post"
+                    })
+            except Exception:
+                pass
+        
+        # Remove duplicates
+        unique_suggestions = []
+        seen = set()
+        for s in suggestions:
+            if s['text'] not in seen:
+                seen.add(s['text'])
+                unique_suggestions.append(s)
+        
+        return {
+            "query": query,
+            "suggestions": unique_suggestions[:limit]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting suggestions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/reindex")
+async def reindex_content():
+    """
+    Rebuild the search index from all blog posts.
+    This is useful after bulk content updates.
+    """
+    try:
+        logger.info("Starting content reindex...")
+        
+        # Trigger vector store rebuild
+        import subprocess
+        result = subprocess.run(
+            ["python3", "build_vector_store.py"],
+            cwd=Path(__file__).parent.parent.parent,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            raise Exception(f"Reindex failed: {result.stderr}")
+        
+        logger.info("Content reindex completed")
+        
+        return {
+            "message": "Content reindexed successfully",
+            "output": result.stdout
+        }
+        
+    except Exception as e:
+        logger.error(f"Reindex error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
